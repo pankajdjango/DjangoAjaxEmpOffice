@@ -7,7 +7,7 @@ class Office(models.Model):
     def __str__(self):
         return self.name
     def natural_key(self):
-        return self #+ self.author.natural_key()
+        return {'name':self.name} #+ self.author.natural_key()
 
 class Employee(models.Model):
     genders = {

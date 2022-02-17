@@ -29,22 +29,21 @@ def employee(request):
         employeeForm=EmployeeForm(request.POST)
         employee=employeeForm.save()
         office=employee.office
-        print("office",office)
+        print("of",office)
         officeJson=model_to_dict(office)
         response=model_to_dict(employee)
+        print(response['office'])
         response['office'] = officeJson
-        print("response",response)
+        print(response['office'])
         return JsonResponse (response)
 
 def getAllOffices(request):
     offices=Office.objects.all()
-    print("office",offices)
     data=serializers.serialize("json",offices)
     return JsonResponse(data,safe=False)
 
 def getAllEmployee(request):
     employee=Employee.objects.all()
-    print("all Employee= ",employee)
     data= serializers.serialize("json",employee,use_natural_foreign_keys=True)
     return JsonResponse(data,safe=False)
 
