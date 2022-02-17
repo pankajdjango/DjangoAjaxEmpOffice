@@ -34,11 +34,11 @@
 </div>
 
 <script>
-  var employeesList = []
-  $(document).ready(function () {
+var employeesList = []
+$(document).ready(function () {
     getAllEmployees()
   })
-  function renderEmployeesTable() {
+function renderEmployeesTable() {
     const tableBody = document.getElementById("employeeTableBody");
     $("#employeeTableBody tr").remove();
     employeesList.forEach(
@@ -75,8 +75,8 @@
           // });
         });
       }
-      function getAllEmployees() {
-        $.ajax({
+function getAllEmployees() {
+    $.ajax({
       method: "GET",
       url: "/employees"
     })
@@ -87,7 +87,7 @@
       renderEmployeesTable()
     })
   }
-  function onsubmitEmployeeForm(event) {
+function onsubmitEmployeeForm(event) {
     event.preventDefault()
     const valuesInArray = $(this).serializeArray()
     const body = {}
