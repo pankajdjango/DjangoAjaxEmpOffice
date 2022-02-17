@@ -1,0 +1,239 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-5 border rounded p-4">
+                <h3>Office Form</h3>
+                <form action="#" class="dd" id='officeForm' autocomplete="off">
+                    {% csrf_token %}
+                    {{officeForm|crispy}}
+                    <input type="submit" class="btn btn-success" value="Submit">
+                </form>
+            </div>
+            <div class="col-7">
+                <table class="table table-hover" id="officeTable">
+                    <thead>
+                        <tr>
+                            <th>S No.</th>
+                            <th>Name</th>
+                            <th>Location</th>
+                        </tr>
+                    </thead>
+                    <tbody id="officeTableId">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div class="row mb-4">
+            <div class="col-lg-5 border rounded p-4">
+                <h3>Employee Form</h3>
+                <form action="#" id="employeeForm" autocomplete="off">
+                    {% csrf_token %}
+                    {{employeeForm|crispy}}
+                    <input type="submit" class="btn btn-info" value="Submit">
+                </form>
+            </div>
+            <div class="col-7">
+                <table class="table table-hover" id="employeeTable">
+                  <thead>
+                    <tr>
+                      <th>S No.</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Email</th>
+                      <th>Gender</th>
+                      <th>Office</th>
+                    </tr>
+                  </thead>
+                  <tbody id="employeeTableBody">
+
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script>
+    var officeList = []
+    var employeesList = []
+    $(document).ready(function(){
+        getAllOffices()
+        getAllEmployees()
+    })
+    function renderEmployeesTable(){
+      const tableBody= document.getElementById("employeeTableBody");
+      $("#employeeTableBody tr").remove();
+      employeesList.forEach(
+        function(employee,index){
+          const row = tableBody.insertRow();
+          const count = document.createElement('td')
+          count.innerHTML = index+1+'.'
+          row.appendChild(count)
+
+          const first_name = document.createElement('td')
+          first_name.innerHTML = employee.first_name
+          row.appendChild(first_name)
+
+          const last_name = document.createElement('td')
+          last_name.innerHTML = employee.last_name
+          row.appendChild(last_name)
+
+          const email = document.createElement('td')
+          email.innerHTML = employee.email
+          row.appendChild(email)
+
+          const gender = document.createElement('td')
+          gender.innerHTML = (employee.gender=="M")?"Male":"Female"
+          row.appendChild(gender)
+
+          const office = document.createElement('td')
+          office.innerHTML = employee.office
+          row.appendChild(office)
+
+            // Object.entries(employee).forEach(([k, v]) => {
+            //   var k = document.createElement('td')
+            //   k.innerHTML = (v=="M")?"Male":(v=="F")?"Female":v
+            //   row.appendChild(k)
+            // });
+        });
+    }
+    function getAllEmployees(){
+      $.ajax({
+        method: "GET",
+        url: "/employees"
+      })
+        .done(function(response){
+          employeesList = JSON.parse(response);
+          employeesList=employeesList.map(e=>e.fields)
+          // console.log(employeesList);
+          renderEmployeesTable()
+        })
+    }
+    function onsubmitEmployeeForm(event) {
+        event.preventDefault()
+        const valuesInArray = $(this).serializeArray()
+        const body = {}
+        valuesInArray.forEach(e => {
+            body[e.name] = e.value
+        })
+        $.ajax({
+            method: "POST",
+            url: "/employee",
+            data: body
+        })
+            .done(function (response) {
+                // console.log(response);
+                event.target.reset()
+                employeesList.push(response)
+                console.log(response);
+                renderEmployeesTable()
+                alert("employee save successfully")
+            })
+            .fail(function (response) {
+                console.log(response);
+            })
+    }
+    function getAllOffices(){
+        $.ajax({
+            method: "GET",
+            url: "/offices"
+        })
+            .done(
+                function(response){
+                  // console.log('res'+response);
+                    const tempOffices=JSON.parse(response)
+                    // console.log("tempOffices"+tempOffices);
+                    officeList = tempOffices;
+                    officeList = officeList.map(e => e.fields)
+                    // console.log(officeList);
+                    renderOfficeTable()
+                    // console.log(tempOffices)
+                }
+            )
+    }
+    function renderOfficeTable(){
+        // console.log("in office tale",officeList);
+        let tableBody = document.getElementById("officeTableId")
+        tableBody.remove()
+        let newBody=document.createElement("tbody")
+        newBody.id="officeTableId"
+        document.getElementById('officeTable').appendChild(newBody)
+        // const tableBody = document.getElementById("officeTableId")
+        // $("#officeTableId tr").remove();    //another method clear tbody
+        // $("#officeTableId tr").detach();   //working
+        officeList.forEach(
+            function(office,index){
+                // console.log("in office",office);
+                // console.log("office fields",office.fields);
+                // office=office.fields
+                // const row = tableBody.insertRow(); //another method clear tbody
+                const row = newBody.insertRow();
+                const count = document.createElement("td")
+                count.innerHTML = index + 1 +'.'
+                const name = document.createElement("td")
+                name.innerHTML=office.name
+                const location = document.createElement("td")
+                location.innerHTML=office.location
+                row.appendChild(count)
+                row.appendChild(name)
+                row.appendChild(location)
+            }
+        )
+    }
+    function onsubmitOfficeForm(event) {
+        event.preventDefault()
+        const valuesInArray = $(this).serializeArray()
+
+        const body = {}
+        // valuesInArray.forEach(e => {
+        //     body[e.name] = e.value
+        // })
+        valuesInArray.reduce((body, e) => {
+            body[e.name] = e.value
+            return body
+        }, body)
+        $.ajax({
+            method: "POST",
+            url: "/office",
+            data: body
+        })
+            .done(function (response) {
+                event.target.reset()
+                officeList.push(response)
+                console.log(response);
+                // console.log(officeList);
+                renderOfficeTable()
+                alert("office save successfully")
+            })
+            .fail(function (response) {
+                console.log(response);
+            })
+        // console.log(valuesInArray);
+        // console.log(body);
+    }
+
+    $("#officeForm").submit(onsubmitOfficeForm);
+    $("#employeeForm").submit(onsubmitEmployeeForm);
+
+
+</script>
