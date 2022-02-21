@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from .models import EmployeeForm, OfficeForm,Office,Employee
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from django.forms.models import model_to_dict
 from django.core import serializers
-
+import json
 def index(request):
     return render(request,"index.html")
 
@@ -24,17 +24,31 @@ def office(request):
         office=officeForm.save()
         return JsonResponse (model_to_dict(office))
 
+def changeEmployeeToJson(employee):
+    office=employee.office
+    officeJson=model_to_dict(office)
+    response=model_to_dict(employee)
+    response['office'] = officeJson
+    return response
 def employee(request):
     if request.method == 'POST':
         employeeForm=EmployeeForm(request.POST)
         employee=employeeForm.save()
         office=employee.office
-        print("of",office)
+       #print("of",office)
         officeJson=model_to_dict(office)
         response=model_to_dict(employee)
-        print(response['office'])
+       #print(response['office'])
         response['office'] = officeJson
-        print(response['office'])
+       #print(response['office'])
+        return JsonResponse (response)
+    elif request.method == 'PUT':
+        data= json.loads(request.body)
+        data['office'] = Office(id=data.get('office'))
+        del data['csrfmiddlewaretoken']
+        employee=Employee(**data)
+        employee.save()
+        response = changeEmployeeToJson(employee)
         return JsonResponse (response)
 
 def getAllOffices(request):
