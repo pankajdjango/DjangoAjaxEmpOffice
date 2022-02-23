@@ -28,11 +28,11 @@
 </div>
 
 <script>
-var officeList = []
-$(document).ready(function () {
+    var officeList = []
+    $(document).ready(function () {
         getAllOffices()
     })
-function getAllOffices() {
+    function getAllOffices() {
         $.ajax({
             method: "GET",
             url: "/offices"
@@ -50,7 +50,7 @@ function getAllOffices() {
                 }
             )
     }
-function renderOfficeTable() {
+    function renderOfficeTable() {
         // console.log("in office tale",officeList);
         let tableBody = document.getElementById("officeTableId")
         tableBody.remove()
@@ -79,7 +79,7 @@ function renderOfficeTable() {
             }
         )
     }
-function onsubmitOfficeForm(event) {
+    function onsubmitOfficeForm(event) {
         event.preventDefault()
         const valuesInArray = $(this).serializeArray()
 

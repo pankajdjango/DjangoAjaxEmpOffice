@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block head %}
-  <title>Employee</title>
+<title>Employee</title>
 {% endblock head %}
 {% block body %}
 
@@ -35,12 +35,12 @@
 </div>
 
 <script>
-var csrfmiddlewaretoken = "{{csrf_token}}"
-var employeesList = []
-$(document).ready(function () {
+  var csrfmiddlewaretoken = "{{csrf_token}}"
+  var employeesList = []
+  $(document).ready(function () {
     getAllEmployees()
   })
-function renderEmployeesTable() {
+  function renderEmployeesTable() {
     const tableBody = document.getElementById("employeeTableBody");
     $("#employeeTableBody tr").remove();
     employeesList.forEach(
@@ -74,12 +74,12 @@ function renderEmployeesTable() {
         const check = document.createElement('input')
         check.type = 'checkbox'
 
-        if (employee.active){
+        if (employee.active) {
           check.checked = "checked"
         }
         activeCol.appendChild(check)
 
-        check.onchange = function(){
+        check.onchange = function () {
           employee.active = check.checked
           // console.log(employee);
           const body = {
@@ -90,18 +90,18 @@ function renderEmployeesTable() {
           // console.log(body);
           const csrftoken = getCookie('csrftoken');
           $.ajax({
-            headers: {'X-CSRFToken': csrftoken},
-            method:"PUT",
+            headers: { 'X-CSRFToken': csrftoken },
+            method: "PUT",
             url: "/employee",
-            data:JSON.stringify(body)
+            data: JSON.stringify(body)
           })
-            .done(function(response){
-              var res=employee.active;
+            .done(function (response) {
+              var res = employee.active;
               console.log(res);
-              var c = (res  ? 'Active' : 'Deactive');
-              alert(response['first_name']+' is '+c);
+              var c = (res ? 'Active' : 'Deactive');
+              alert(response['first_name'] + ' is ' + c);
             })
-            .fail(function(response){
+            .fail(function (response) {
               console.log(response);
             })
         }
@@ -109,48 +109,48 @@ function renderEmployeesTable() {
 
 
         // Object.entries(employee).forEach(([k, v]) => {
-          //   var k = document.createElement('td')
-          //   k.innerHTML = (v=="M")?"Male":(v=="F")?"Female":v
-          //   row.appendChild(k)
-          // });
-        });
-      }
-function getCookie(name) {
+        //   var k = document.createElement('td')
+        //   k.innerHTML = (v=="M")?"Male":(v=="F")?"Female":v
+        //   row.appendChild(k)
+        // });
+      });
+  }
+  function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
         }
+      }
     }
     return cookieValue;
-}
+  }
 
-function getAllEmployees() {
+  function getAllEmployees() {
     $.ajax({
       method: "GET",
       url: "/employees"
     })
-    .done(function (response) {
-      employeesList = JSON.parse(response);
-      //employeesList = employeesList.map(e => e.fields)
-      employeesList = employeesList.map(e => {
-       const employee = {
-        ...e.fields,
-        id: e.pk
-       }
-       return employee
+      .done(function (response) {
+        employeesList = JSON.parse(response);
+        //employeesList = employeesList.map(e => e.fields)
+        employeesList = employeesList.map(e => {
+          const employee = {
+            ...e.fields,
+            id: e.pk
+          }
+          return employee
+        })
+        // console.log(employeesList);
+        renderEmployeesTable()
       })
-      // console.log(employeesList);
-      renderEmployeesTable()
-    })
   }
-function onsubmitEmployeeForm(event) {
+  function onsubmitEmployeeForm(event) {
     event.preventDefault()
     const valuesInArray = $(this).serializeArray()
     const body = {}
@@ -162,17 +162,17 @@ function onsubmitEmployeeForm(event) {
       url: "/employee",
       data: body
     })
-    .done(function (response) {
-      // console.log(response);
-      event.target.reset()
-      employeesList.push(response)
-      // console.log(response);
-      renderEmployeesTable()
-      alert("employee save successfully")
-    })
-    .fail(function (response) {
-      console.log(response);
-    })
+      .done(function (response) {
+        // console.log(response);
+        event.target.reset()
+        employeesList.push(response)
+        // console.log(response);
+        renderEmployeesTable()
+        alert("employee save successfully")
+      })
+      .fail(function (response) {
+        console.log(response);
+      })
   }
 
   $("#employeeForm").submit(onsubmitEmployeeForm);
