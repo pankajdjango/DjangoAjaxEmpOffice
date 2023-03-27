@@ -3,8 +3,8 @@ from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('',views.index),
+    path('admin/', admin.site.urls),
     path('home',views.home,name="home"),
     path('office',views.office,name="office"),
     path('employee',views.employee,name="employee"),

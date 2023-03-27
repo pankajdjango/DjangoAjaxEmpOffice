@@ -1,119 +1,111 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block body %}
-
 <div class="row m-2">
-    <div class="col-4 border rounded p-4">
-        <h3>Office Form</h3>
-        <form action="#" class="dd" id='officeForm' autocomplete="off">
-            {% csrf_token %}
-            {{officeForm|crispy}}
-            <input type="submit" class="btn btn-success" value="Submit">
-        </form>
-    </div>
-    <div class="col-8">
-        <table class="table table-hover" id="officeTable">
-            <thead>
-                <tr>
-                    <th>S No.</th>
-                    <th>Name</th>
-                    <th>Location</th>
-                </tr>
-            </thead>
-            <tbody id="officeTableId">
-
-            </tbody>
-        </table>
-    </div>
+   <div class="col-4 border rounded p-4">
+      <h3>Office Form</h3>
+      <form action="#" class="dd" id='officeForm' autocomplete="off">
+         {% csrf_token %}
+         {{officeForm|crispy}}
+         <input type="submit" class="btn btn-success" value="Submit">
+      </form>
+   </div>
+   <div class="col-8">
+      <table class="table table-hover" id="officeTable">
+         <thead>
+            <tr>
+               <th>S No.</th>
+               <th>Name</th>
+               <th>Location</th>
+            </tr>
+         </thead>
+         <tbody id="officeTableId">
+         </tbody>
+      </table>
+   </div>
 </div>
-
 <script>
-    var officeList = []
-    $(document).ready(function () {
-        getAllOffices()
-    })
-    function getAllOffices() {
-        $.ajax({
-            method: "GET",
-            url: "/offices"
-        })
-            .done(
-                function (response) {
-                    // console.log('res'+response);
-                    const tempOffices = JSON.parse(response)
-                    // console.log("tempOffices"+tempOffices);
-                    officeList = tempOffices;
-                    officeList = officeList.map(e => e.fields)
-                    // console.log(officeList);
-                    renderOfficeTable()
-                    // console.log(tempOffices)
-                }
-            )
-    }
-    function renderOfficeTable() {
-        // console.log("in office tale",officeList);
-        let tableBody = document.getElementById("officeTableId")
-        tableBody.remove()
-        let newBody = document.createElement("tbody")
-        newBody.id = "officeTableId"
-        document.getElementById('officeTable').appendChild(newBody)
-        // const tableBody = document.getElementById("officeTableId")
-        // $("#officeTableId tr").remove();    //another method clear tbody
-        // $("#officeTableId tr").detach();   //working
-        officeList.forEach(
-            function (office, index) {
-                // console.log("in office",office);
-                // console.log("office fields",office.fields);
-                // office=office.fields
-                // const row = tableBody.insertRow(); //another method clear tbody
-                const row = newBody.insertRow();
-                const count = document.createElement("td")
-                count.innerHTML = index + 1 + '.'
-                const name = document.createElement("td")
-                name.innerHTML = office.name
-                const location = document.createElement("td")
-                location.innerHTML = office.location
-                row.appendChild(count)
-                row.appendChild(name)
-                row.appendChild(location)
-            }
-        )
-    }
-    function onsubmitOfficeForm(event) {
-        event.preventDefault()
-        const valuesInArray = $(this).serializeArray()
+   var officeList = []
+   $(document).ready(function () {
+       getAllOffices()
+   })
+   function getAllOffices() {
+       $.ajax({
+           method: "GET",
+           url: "/offices"
+       })
+           .done(
+               function (response) {
+                   // console.log('res'+response);
+                   const tempOffices = JSON.parse(response)
+                   // console.log("tempOffices"+tempOffices);
+                   officeList = tempOffices;
+                   officeList = officeList.map(e => e.fields)
+                   // console.log(officeList);
+                   renderOfficeTable()
+                   // console.log(tempOffices)
+               }
+           )
+   }
+   function renderOfficeTable() {
+       // console.log("in office tale",officeList);
+       let tableBody = document.getElementById("officeTableId")
+       tableBody.remove()
+       let newBody = document.createElement("tbody")
+       newBody.id = "officeTableId"
+       document.getElementById('officeTable').appendChild(newBody)
+       // const tableBody = document.getElementById("officeTableId")
+       // $("#officeTableId tr").remove();    //another method clear tbody
+       // $("#officeTableId tr").detach();   //working
+       officeList.forEach(
+           function (office, index) {
+               // console.log("in office",office);
+               // console.log("office fields",office.fields);
+               // office=office.fields
+               // const row = tableBody.insertRow(); //another method clear tbody
+               const row = newBody.insertRow();
+               const count = document.createElement("td")
+               count.innerHTML = index + 1 + '.'
+               const name = document.createElement("td")
+               name.innerHTML = office.name
+               const location = document.createElement("td")
+               location.innerHTML = office.location
+               row.appendChild(count)
+               row.appendChild(name)
+               row.appendChild(location)
+           }
+       )
+   }
+   function onsubmitOfficeForm(event) {
+       event.preventDefault()
+       const valuesInArray = $(this).serializeArray()
 
-        const body = {}
-        // valuesInArray.forEach(e => {
-        //     body[e.name] = e.value
-        // })
-        valuesInArray.reduce((body, e) => {
-            body[e.name] = e.value
-            return body
-        }, body)
-        $.ajax({
-            method: "POST",
-            url: "/office",
-            data: body
-        })
-            .done(function (response) {
-                event.target.reset()
-                officeList.push(response)
-                // console.log(response);
-                // console.log(officeList);
-                renderOfficeTable()
-                alert("office save successfully")
-            })
-            .fail(function (response) {
-                console.log(response);
-            })
-        // console.log(valuesInArray);
-        // console.log(body);
-    }
+       const body = {}
+       // valuesInArray.forEach(e => {
+       //     body[e.name] = e.value
+       // })
+       valuesInArray.reduce((body, e) => {
+           body[e.name] = e.value
+           return body
+       }, body)
+       $.ajax({
+           method: "POST",
+           url: "/office",
+           data: body
+       })
+           .done(function (response) {
+               event.target.reset()
+               officeList.push(response)
+               renderOfficeTable()
+               alert("office save successfully")
+           })
+           .fail(function (response) {
+               console.log(response);
+           })
+   }
 
-    $("#officeForm").submit(onsubmitOfficeForm);
+   $("#officeForm").submit(onsubmitOfficeForm);
 
 
 </script>
-
 {% endblock body %}
